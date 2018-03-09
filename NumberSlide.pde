@@ -3,16 +3,20 @@ import java.util.Arrays;
 Grid grid;
 int score;
 float topBarSize = 25;
+boolean isMoving;
+boolean isStationary;
 
 
 void setup() {
   size(400, 400);
   background(255);
   grid = new Grid(100, 4);
+  isStationary = true;
+  isMoving = false;
 }
 
 void keyPressed() {
-  grid.slide(keyCode);
+  isMoving = grid.slide(keyCode);
 }
 
 void draw() {
@@ -20,5 +24,14 @@ void draw() {
   background(0);
   
   grid.display();
+  
+  grid.removeTiles();
+  
+  if (isMoving) { 
+    if (grid.isStationary()) {
+      isMoving = false;
+      grid.addTile();
+    }
+  }
   
 }

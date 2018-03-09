@@ -33,11 +33,21 @@ class Tile {
   void collide() {
     if (neighbour == null) return;      
     if (Math.abs(neighbour.pos.x - pos.x) < size && vel.x != 0) {
+      if (num == neighbour.num) {
+        num = 0;
+        neighbour.num *= 2;
+        return;
+      }
       float offset = size;
       if (vel.x > 0) offset *= -1;
       pos.x = neighbour.pos.x + offset;
       vel = neighbour.vel;
     } else if (Math.abs(neighbour.pos.y - pos.y) < size && vel.y != 0) {
+      if (num == neighbour.num) {
+        num = 0;
+        neighbour.num *= 2;
+        return;
+      }
       float offset = size;
       if (vel.y > 0) offset *= -1;
       pos.y = neighbour.pos.y + offset;

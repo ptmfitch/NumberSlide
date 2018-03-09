@@ -2,10 +2,16 @@ import java.util.Arrays;
 
 class Grid {
   
+  //REFACTOR AS A STATE MACHINE
+  // 1 - button pressed
+  // 2 - calculate next state
+  // 3 - if different show sliding animation, add new tile when finished, else do nothing
+  
   ArrayList<Tile> tiles;
   float len;
   float tileSize;
   PVector boundary;
+  int speed = 4; // Speed is tiles per second
   
   Grid(int tileSize_, int len_) {
     tileSize = tileSize_;
@@ -21,6 +27,17 @@ class Grid {
     addTile();
   }
   
+  void removeTiles() {
+    for (int i = 0; i < tiles.size(); i++) {
+      Tile tile = tiles.get(i);
+      findNeighbour(tile, PVector.mult(tile.vel, speed));
+      if (tile.num == 0) {
+        tiles.remove(tile);
+        i--;
+      }
+    }
+  }
+  
   void addTile() {
     PVector randomPos = new PVector((int)random(0,len) * tileSize, (int)random(0,len) * tileSize);
     while (isOccupied(randomPos)) {
@@ -34,28 +51,32 @@ class Grid {
     return false;
   }
   
-  void slide(int pressed) {
-    PVector vel;
-    PVector offset = null;
+  boolean slide(int pressed) {
+    PVector vel = null;
     if (pressed == RIGHT) {
-      vel = new PVector(10, 0);
-      offset = new PVector(tileSize, 0);
+      vel = new PVector(tileSize/speed, 0);
     } else if (pressed == LEFT) {
-      vel = new PVector(-10, 0);
-      offset = new PVector(-tileSize, 0);
+      vel = new PVector(-tileSize/speed, 0);
     } else if (pressed == UP) {
-      vel = new PVector(0, -10);
-      offset = new PVector(0, -tileSize);
+      vel = new PVector(0, -tileSize/speed);
     } else if (pressed == DOWN) {
-      vel = new PVector(0, 10);
-      offset = new PVector(0, tileSize);
-    } else {
-      vel = new PVector(0, 0);
+      vel = new PVector(0, tileSize/speed);
     }
+    if (vel == null) return false;
     for (Tile tile : tiles) {
-      tile.neighbour = findNeighbour(tile, offset);
+      tile.neighbour = findNeighbour(tile, PVector.mult(vel, speed));
       tile.vel = vel;
     }
+    return true;
+  }
+  
+  boolean isStationary() {
+    for (Tile tile : tiles) {
+      if (tile.vel.mag() > 0) {
+        return false;
+      }
+    }
+    return true;
   }
   
   Tile findNeighbour(Tile tile, PVector offset) {
