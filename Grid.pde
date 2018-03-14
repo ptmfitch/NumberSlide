@@ -30,7 +30,7 @@ class Grid {
   void removeTiles() {
     for (int i = 0; i < tiles.size(); i++) {
       Tile tile = tiles.get(i);
-      findNeighbour(tile, PVector.mult(tile.vel, speed));
+      tile.findNeighbour(tiles);
       if (tile.num == 0) {
         tiles.remove(tile);
         i--;
@@ -64,7 +64,7 @@ class Grid {
     }
     if (vel == null) return false;
     for (Tile tile : tiles) {
-      tile.neighbour = findNeighbour(tile, PVector.mult(vel, speed));
+      tile.findNeighbour(tiles);
       tile.vel = vel;
     }
     return true;
@@ -77,18 +77,6 @@ class Grid {
       }
     }
     return true;
-  }
-  
-  Tile findNeighbour(Tile tile, PVector offset) {
-    if (offset == null) return null;
-    PVector search = PVector.add(tile.pos, offset);
-    while (search.x >= 0 && search.x <= boundary.x && search.y >= 0 && search.y <= boundary.y) {
-      for (Tile toSearch : tiles) {
-        if (toSearch.pos.equals(search)) return toSearch;
-      }
-      search.add(offset);
-    }
-    return null;
   }
   
   void display() {

@@ -4,6 +4,7 @@ class Tile {
   PVector vel;
   float size; // Length of each side
   int num; // Value of tile
+  boolean combined;
   
   Tile neighbour;
   
@@ -15,6 +16,7 @@ class Tile {
     maxPos = maxPos_;
     size = size_;
     num = (Math.random()<0.5)?2:4;
+    combined = false;
   }
   
   int getNum() {
@@ -25,17 +27,27 @@ class Tile {
     num = num_;
   }
   
-  void combine(Tile t_) {
-    num += t_.getNum();
-    t_.setNum(0);
+  int getDir() {
+    if (vel.x == 0 && vel.y < 0) {
+      return 0; // UP
+    } else if (vel.y == 0 && vel.x > 0) {
+      return 1; // RIGHT
+    } else if (vel.x == 0 && vel.y > 0) {
+      return 2; // DOWN
+    } else if (vel.y == 0 && vel.x < 0) {
+      return 3; // LEFT
+    } else {
+      return -1; // OTHER
+    }
   }
   
   void collide() {
     if (neighbour == null) return;      
-    if (Math.abs(neighbour.pos.x - pos.x) < size && vel.x != 0) {
-      if (num == neighbour.num) {
+    if (Math.abs(neighbour.pos.x - pos.x) < size && vel.x != 0) { // Horizontal collision
+      if (num == neighbour.num && !neighbour.combined) {
         num = 0;
         neighbour.num *= 2;
+        neighbour.combined = true;
         return;
       }
       float offset = size;
@@ -43,9 +55,10 @@ class Tile {
       pos.x = neighbour.pos.x + offset;
       vel = neighbour.vel;
     } else if (Math.abs(neighbour.pos.y - pos.y) < size && vel.y != 0) {
-      if (num == neighbour.num) {
+      if (num == neighbour.num && !neighbour.combined) {
         num = 0;
         neighbour.num *= 2;
+        neighbour.combined = true;
         return;
       }
       float offset = size;
@@ -58,7 +71,7 @@ class Tile {
   void display() {
     
     checkEdges();
-    collide();
+    if (vel.mag() != 0) collide();
     
     pos.add(vel);
     
@@ -104,6 +117,53 @@ class Tile {
       pos.y = maxPos.y;
       vel = new PVector(0, 0);
     }
+  }
+  
+  void findNeighbour(ArrayList<Tile> tiles) {
+    Tile neighbour_ = null;
+    for (Tile toSearch : tiles) {
+      switch(getDir()) {
+        case 0: // UP
+          if (toSearch.pos.x == pos.x && toSearch.pos.y < pos.y) {
+            if (neighbour_ == null) {
+              neighbour_ = toSearch;
+            } else {
+              if (toSearch.pos.y > neighbour_.pos.y) neighbour_ = toSearch;
+            }
+          }
+          break;
+        case 1: // RIGHT
+          if (toSearch.pos.y == pos.y && toSearch.pos.x > pos.x) {
+            if (neighbour_ == null) {
+              neighbour_ = toSearch;
+            } else {
+              if (toSearch.pos.x < neighbour_.pos.x) neighbour_ = toSearch;
+            }
+          }
+          break;
+        case 2: // DOWN
+          if (toSearch.pos.x == pos.x && toSearch.pos.y > pos.y) {
+            if (neighbour_ == null) {
+              neighbour_ = toSearch;
+            } else {
+              if (toSearch.pos.y < neighbour_.pos.y) neighbour_ = toSearch;
+            }
+          }
+          break;
+        case 3: // LEFT
+          if (toSearch.pos.y == pos.y && toSearch.pos.x < pos.x) {
+            if (neighbour_ == null) {
+              neighbour_ = toSearch;
+            } else {
+              if (toSearch.pos.x > neighbour_.pos.x) neighbour_ = toSearch;
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    neighbour = neighbour_;
   }
   
 }

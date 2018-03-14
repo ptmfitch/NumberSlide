@@ -30,6 +30,9 @@ void draw() {
   if (isMoving) { 
     if (grid.isStationary()) {
       isMoving = false;
+      for(Tile tile : grid.tiles) {
+        tile.combined = false;
+      }
       grid.addTile();
     }
   }
