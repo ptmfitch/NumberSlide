@@ -1,6 +1,8 @@
 import processing.core.{PApplet, PVector}
 import Grid._
+import Direction._
 
+import scala.collection.immutable
 import scala.collection.mutable.ArrayBuffer
 
 object Grid {
@@ -29,7 +31,13 @@ class Grid extends PApplet {
   var tiles: ArrayBuffer[Tile] = new ArrayBuffer[Tile]()
 
   def resetGrid(): Unit = {
+    tiles = new ArrayBuffer[Tile]()
     (0 to 1).foreach(_ => addTile())
+  }
+  
+  def tiles_=(ts: Iterable[Tile]): Unit = {
+    tiles = new ArrayBuffer[Tile]()
+    tiles ++= ts
   }
 
   def addTile(): Unit = {
@@ -38,5 +46,37 @@ class Grid extends PApplet {
       case pv => tiles.append(new Tile(pv))
     }
   }
+
+  def slide(dir: Direction): Unit = {
+    dir match {
+      case Left =>
+        val collapsed: Iterable[List[Tile]] = tiles.sortBy(_.pos.x).groupBy(_.pos.y).map { case (_, ts) => collapse(ts.toList) }
+        collapsed.foreach(_.zipWithIndex.foreach { case (tile, n) => tile.posx_=(n * tile.size) })
+        tiles_=(collapsed.flatten)
+      case Up =>
+        val collapsed: Iterable[List[Tile]] = tiles.sortBy(_.pos.y).groupBy(_.pos.x).map { case (_, ts) => collapse(ts.toList) }
+        collapsed.foreach(_.zipWithIndex.foreach { case (tile, n) => tile.posy_=(n * tile.size) })
+        tiles_=(collapsed.flatten)
+      case Right =>
+        val collapsed: Iterable[List[Tile]] = tiles.sortBy(_.pos.x).reverse.groupBy(_.pos.y).map { case (_, ts) => collapse(ts.toList) }
+        collapsed.foreach(_.zipWithIndex.foreach { case (tile, n) => tile.posx_=(gridWidth - (n + 1) * tile.size) })
+        tiles_=(collapsed.flatten)
+      case Down =>
+        val collapsed: Iterable[List[Tile]] = tiles.sortBy(_.pos.y).reverse.groupBy(_.pos.x).map { case (_, ts) => collapse(ts.toList) }
+        collapsed.foreach(_.zipWithIndex.foreach { case (tile, n) => tile.posy_=(gridHeight - (n + 1) * tile.size) })
+        tiles_=(collapsed.flatten)
+    }
+    addTile()
+  }
+
+  def collapse(ts: List[Tile]): List[Tile] = ts match {
+    case _ if ts.isEmpty => ts
+    case h :: Nil => List(h)
+    case h :: t if h.num == t.head.num =>
+      h.doubleNum()
+      if (t.tail.nonEmpty) h +: collapse(t.tail) else List(h)
+    case h :: t => h +: collapse(t)
+  }
+
 
 }

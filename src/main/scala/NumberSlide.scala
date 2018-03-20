@@ -1,5 +1,6 @@
-import processing.core.{PApplet, PVector}
+import processing.core.{PApplet, PConstants, PVector}
 import Grid._
+import Direction._
 
 object NumberSlide extends PApplet {
   def main(args: Array[String]): Unit = {
@@ -8,7 +9,7 @@ object NumberSlide extends PApplet {
   }
 }
 
-class NumberSlide extends PApplet {
+class NumberSlide extends PApplet with PConstants {
 
   val grid: Grid = new Grid
 
@@ -19,8 +20,16 @@ class NumberSlide extends PApplet {
   override def setup(): Unit = {
     gridStart_=(new PVector(0, 0))
     gridEnd_=(new PVector(width, height))
-    tileNum_=(4)
+    tileNum_=(5)
     grid.resetGrid()
+  }
+
+  override def keyPressed(): Unit = keyCode match {
+    case _ if KeyConfig.left.contains(keyCode) => grid.slide(Left)
+    case _ if KeyConfig.up.contains(keyCode) => grid.slide(Up)
+    case _ if KeyConfig.right.contains(keyCode) => grid.slide(Right)
+    case _ if KeyConfig.down.contains(keyCode) => grid.slide(Down)
+    case _ => println("Unrecognised keyCode: " + keyCode)
   }
 
   override def draw(): Unit = {
@@ -31,8 +40,11 @@ class NumberSlide extends PApplet {
     grid.tiles.foreach(tile => {
       tile.update()
       stroke(0)
-      fill(100, 200, 0)
-      rect(tile.pos.x, tile.pos.y, tile.size, tile.size)
+      fill(ColorPicker.pickColor(tile.num))
+      rect(tile.pos.x, tile.pos.y, tile.size, tile.size, tile.size / 8)
+      fill(0)
+      textAlign(PConstants.CENTER)
+      text(tile.num, tile.pos.x + tileSize/2, tile.pos.y + tileSize/2)
     })
   }
 
