@@ -33,25 +33,37 @@ object Direction extends Enumeration {
 }
 
 class Tile(private var _pos: PVector) extends PApplet {
+  def pos: PVector = _pos.copy()
+  def pos_=(value: PVector): Unit = _pos = value
+  def posX_=(value: Float): Unit = _pos.x = value
+  def posY_=(value: Float): Unit = _pos.y = value
+
+  private var _nextPos: PVector = _pos.copy()
+  def nextPos: PVector = _nextPos.copy()
+  def nextPos_=(value: PVector): Unit = _nextPos = value
+  def nextPosX_=(value: Float): Unit = _nextPos.x = value
+  def nextPosY_=(value: Float): Unit = _nextPos.y = value
+
+  private var _isActive: Boolean = true
+  def isActive: Boolean = _isActive
+  //noinspection AccessorLikeMethodIsUnit
+  def isActive_=(value: Boolean): Unit = _isActive = value
 
   private var _vel: PVector = new PVector(0, 0)
+  def vel: PVector = _vel.copy()
+  def vel_=(value: PVector): Unit = _vel = value
+  def velX_=(value: Float): Unit = _vel.x = value
+  def velY_=(value: Float): Unit = _vel.y = value
+
   private var _num: Int = if (Math.random < 0.5) 2 else 4
+  def num: Int = _num
+  def num_=(value: Int): Unit = _num = value
+
+  private var _nextNum: Int = _num
+  def nextNum: Int = _nextNum
+  def nextNum_=(value: Int): Unit = _nextNum = value
 
   val size: Float = tileSize
-
-  def pos: PVector = _pos
-  def pos_=(value: PVector): Unit = _pos = value
-  def posx_=(value: Float): Unit = _pos.x = value
-  def posy_=(value: Float): Unit = _pos.y = value
-
-  def vel: PVector = _vel
-  def vel_=(value: PVector): Unit = _vel = value
-  def velx_=(value: Float): Unit = _vel.x = value
-  def vely_=(value: Float): Unit = _vel.y = value
-
-  def num: Int = _num
-  def doubleNum(): Unit = _num *= 2
-  def resetNum(): Unit = _num = 0
 
   def checkEdges(): Unit = _pos match {
     case _ if _pos.x < gridStart.x => pos.x = gridStart.x

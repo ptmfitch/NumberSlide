@@ -20,7 +20,7 @@ class NumberSlide extends PApplet with PConstants {
   override def setup(): Unit = {
     gridStart_=(new PVector(0, 0))
     gridEnd_=(new PVector(width, height))
-    tileNum_=(5)
+    tileNum_=(4)
     grid.resetGrid()
   }
 
