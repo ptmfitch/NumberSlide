@@ -2,7 +2,7 @@ import processing.core.{PApplet, PConstants, PVector}
 import Grid._
 import Direction._
 
-object NumberSlide extends PApplet {
+object NumberSlideApp extends PApplet {
   def main(args: Array[String]): Unit = {
     val numberSlide: NumberSlide = new NumberSlide
     PApplet.runSketch(Array("NumberSlide"), numberSlide)
